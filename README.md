@@ -15,12 +15,12 @@
 ## Utilización
 
 ### Paso 1
-Colocar todos los archivos de un vuelo en una misma carpeta: imágenes, plan de vuelo, mosaico, modelo de elevación, etc.
+Colocar todos los archivos de un vuelo en una misma carpeta: imágenes, plan de vuelo, mosaico, modelo de elevación, etc. (también puede ser una carpeta con subcarpetas)
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182928249-f728c5a9-82f0-4356-b61e-5d0704d9db0f.png)
 
 ### Paso 2
-Con la función "Nuevo vuelo", Bitácora lee toda la información contenida en las imágenes (fechas y horarios, coordenadas, altura de vuelo, cámara utilizada, etc.), y luego nos solicitará un nombre para identificar el vuelo y una descripción
+Con la función "Nuevo vuelo", Bitácora solicitará que seleccionemos la carpeta, leerá toda la información contenida en las imágenes y demás archivos (fechas y horarios, coordenadas, altura de vuelo, cámara utilizada, etc.), y luego nos solicitará un nombre para identificar el vuelo y una descripción opcional
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182928563-ec6c487a-ee30-4be4-84b3-818b6ce51b30.png)
 
