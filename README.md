@@ -56,7 +56,7 @@ También se guardan los datos del vuelo en la carpeta original, en formatos comp
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182951201-ea2ff746-1542-4dc9-ab27-d515c94b3778.png)
 
-### Plan de vuelo (archivos .waypoint, para drones que utilizan software ArduPilot)
+### Plan de vuelo (archivos .waypoint)
 - Velocidad de vuelo
 - Altura de vuelo
 - Coordenadas del plan de vuelo
@@ -70,10 +70,14 @@ También se guardan los datos del vuelo en la carpeta original, en formatos comp
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182951952-d5e80f94-ad6f-40d1-88a8-18fa49ac2c71.png)
 
-### Mosaicos o modelos de elevación (archivos .tif)
+### Mosaico (archivos .tif)
 - Visualización de una miniatura de la imagen
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182952271-ddcb92b7-df7f-4828-bd03-2c6d24232e67.png)
 
+### Modelo de elevación (archivos .tif)
+- Visualización de una miniatura de la imagen
+
+![imagen](https://user-images.githubusercontent.com/8480839/182954453-90254f60-abba-4280-9947-500465756835.png)
 
 
