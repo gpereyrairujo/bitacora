@@ -3,6 +3,8 @@
 
 **Bitácora** es una herramienta para ayudar a organizar la información generada con drones. Permite visualizar y organizar la información generada antes, durante y después de los vuelos.
 
+---
+
 ## Instalación
 
 1. Descargar el archivo zip desde https://github.com/gpereyrairujo/bitacora/releases/download/v0.6.0-alpha/bitacora.0.6.win.zip (o la última versión publicada en https://github.com/gpereyrairujo/bitacora/releases)
@@ -11,6 +13,7 @@
 
 3. Para abrir Bitácora, hacer doble clic en el archivo ejecutable `bitacora.exe` (para más comodidad, se puede crear un acceso directo, o arrastrar el archivo a la barra de tareas para fijarlo)
 
+---
 
 ## Utilización
 
@@ -37,7 +40,40 @@ También se guardan los datos del vuelo en la carpeta original, en formatos comp
 
 ![imagen](https://user-images.githubusercontent.com/8480839/182929040-6a582e9e-3ed1-43d8-a9f2-803f5c862a73.png)
 
+---
 
+## Archivos compatibles e información extraída/visualizada
+
+### Imágenes (archivos .jpg o .jpeg)
+- Cantidad de imágenes
+- Nombre de la primera y la última imagen
+- Nombre de la cámara utilizada
+- Velocidad de obturación
+- Sensibilidad ISO
+- Coordenadas GPS (longitud, latitud y altitud)
+- Superficie cubierta por las imágenes
+- Visualización de la posición de cada imagen y del recorrido del dron
+
+![imagen](https://user-images.githubusercontent.com/8480839/182951201-ea2ff746-1542-4dc9-ab27-d515c94b3778.png)
+
+### Plan de vuelo (archivos .waypoint, para drones que utilizan software ArduPilot)
+- Velocidad de vuelo
+- Altura de vuelo
+- Coordenadas del plan de vuelo
+- Visualización del recorrido del dron
+
+![imagen](https://user-images.githubusercontent.com/8480839/182951704-6c7b4e2f-b3b6-4134-ba78-5b7c0894eee0.png)
+
+### Polígono del área de estudio (archivos .poly)
+- Coordenadas del área de estudio
+- Visualización del área de estudio
+
+![imagen](https://user-images.githubusercontent.com/8480839/182951952-d5e80f94-ad6f-40d1-88a8-18fa49ac2c71.png)
+
+### Mosaicos o modelos de elevación (archivos .tif)
+- Visualización de una miniatura de la imagen
+
+![imagen](https://user-images.githubusercontent.com/8480839/182952271-ddcb92b7-df7f-4828-bd03-2c6d24232e67.png)
 
 
 
