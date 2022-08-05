@@ -3,6 +3,8 @@
 
 La aplicación de código abierto **Bitácora** ayuda a visualizar y organizar todos los archivos, imágenes y metadatos generados antes, durante, y luego de un vuelo de dron, para almacenarlos, compartirlos o continuar su análisis. El usuario sólo necesita guardar en una misma carpeta todos los archivos generados (polígono del área relevada, plan de vuelo, imágenes capturadas, mosaico, modelo de elevación, etc.), y el programa generará automáticamente un mapa visualizando los archivos y una tabla con información del vuelo (fecha y hora del vuelo, ubicación, altitud, velocidad, nombres de archivos relevantes). Esta información también se guarda en formatos abiertos compatibles con otros programas (tabla de información de vuelo en formato csv, mapa de vuelo en formato png y kml). Esta aplicación forma parte del <a href="https://vuela.cc/toolkit">"Open Science Drone Toolkit"</a>.
 
+![imagen](https://user-images.githubusercontent.com/8480839/183097092-b23e161b-9aa1-41ea-9faa-6abb67ef5fa3.png)
+
 
 &nbsp;
 ## Instalación
