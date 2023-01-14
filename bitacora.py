@@ -47,6 +47,11 @@ import numpy as np
 # para abrir carpetas de archivos
 import webbrowser
 
+# para averiguar la ubicación de la carpeta Documentos en Windows
+from win32com.shell import shell, shellcon
+
+# para copiar archivos
+import shutil
 
 ###################
 
@@ -69,13 +74,15 @@ class Vuelo:
         # leer nombres de variables
         ruta_programa = inspect.getframeinfo(inspect.currentframe()).filename
         carpeta_programa = os.path.dirname(os.path.abspath(ruta_programa))
-        ruta_archivo_variables = os.path.join(carpeta_programa, '_configuracion', 'variables.xlsx')
+        ruta_archivo_variables = os.path.join(carpeta_programa, 'bitacora_archivos', 'variables.xlsx')
         self.tabla_variables = pd.read_excel(ruta_archivo_variables, engine='openpyxl')
 
         if leer_bitacora:
             # si ya hay una tabla de datos, leerla
             if os.path.exists(os.path.join(carpeta, self.bitacora_csv)):
                 self.leer_datos_csv()
+                # independientemente de qué "carpeta" figure en el archivo csv, asignar el valor de la carpeta en la que se leyó el archivo
+                self.info['carpeta'] = carpeta
             else: 
                 leer_bitacora = False
             # si ya hay una imagen del mapa, leerla
@@ -367,24 +374,24 @@ class Vuelo:
         descripcion = self.info['descripcion']
         carpeta = self.info['carpeta']
         global version_bitacora
-        fecha = ''
-        hora = ''
-        superficie_cubierta = ''
-        lista_imagenes = ''
-        camara = ''
-        exposicion = ''
-        iso = ''
-        latitud = ''
-        longitud = ''
-        altitud = ''
-        altitud_de_vuelo = ''
-        velocidad_de_vuelo = ''
+        fecha = pd.NA
+        hora = pd.NA
+        superficie_cubierta = pd.NA
+        lista_imagenes = pd.NA
+        camara = pd.NA
+        exposicion = pd.NA
+        iso = pd.NA
+        latitud = pd.NA
+        longitud = pd.NA
+        altitud = pd.NA
+        altitud_de_vuelo = pd.NA
+        velocidad_de_vuelo = pd.NA
  
         # listar poligonos
         poligonos = self.elementos.loc[self.elementos.tipo_archivo == 'polígono']
         if len(poligonos)>1: poligono = ', '.join(poligonos.archivo.to_list())
         elif len(poligonos)==1: poligono = poligonos.archivo.to_list()[0]
-        else: poligono = ''
+        else: poligono = pd.NA
         # tomar las coordenadas del polígono más reciente
         if len(poligonos)>0:
             geometry_poligono = poligonos.sort_values(by='datetime', ascending=False).geometry.to_list()[0]
@@ -395,7 +402,7 @@ class Vuelo:
         planes = self.elementos.loc[self.elementos.tipo_archivo == 'plan de vuelo']
         if len(planes)>1: plan_de_vuelo = ', '.join(planes.archivo.to_list())
         elif len(planes)==1: plan_de_vuelo = planes.archivo.to_list()[0]
-        else: plan_de_vuelo = ''
+        else: plan_de_vuelo = pd.NA
         # tomar las coordenadas y datos de vuelo del plan de vuelo más reciente
         if len(planes)>0:
             archivo_plan = planes.sort_values(by='datetime', ascending=False).archivo.to_list()[0]
@@ -412,7 +419,7 @@ class Vuelo:
         registros = self.elementos.loc[self.elementos.tipo_archivo == 'telemetría']
         if len(registros)>1: registro_telemetria = ', '.join(registros.archivo.to_list())
         elif len(registros)==1: registro_telemetria = registros.archivo.to_list()[0]
-        else: registro_telemetria = ''
+        else: registro_telemetria = pd.NA
         # tomar la fecha de la primera telemetría
         if len(registros)>0:
             fecha = registros.sort_values(by='datetime').fecha.to_list()[0]
@@ -453,8 +460,8 @@ class Vuelo:
         # listar mosaicos ordenados por fecha (más reciente primero)
         mosaicos = self.elementos.sort_values(by='datetime', ascending=False).loc[self.elementos.tipo_archivo == 'mosaico / dem']
         # excluir los archivos que sean dsm o dtm
-        mosaicos = mosaicos[~mosaicos['archivo'].str.endswith('dsm.tif')]
-        mosaicos = mosaicos[~mosaicos['archivo'].str.endswith('dtm.tif')]
+        mosaicos = mosaicos.loc[~mosaicos['archivo'].str.endswith('dsm.tif')]
+        mosaicos = mosaicos.loc[~mosaicos['archivo'].str.endswith('dtm.tif')]
         # separar y poner primero en la lista los que terminan en 'orthophoto.tif'
         mosaicos_orthophoto_tif = mosaicos.loc[mosaicos['archivo'].str.endswith('orthophoto.tif')]
         mosaicos_no_orthophoto_tif = mosaicos.loc[~mosaicos['archivo'].str.endswith('orthophoto.tif')]
@@ -462,16 +469,16 @@ class Vuelo:
         # listar mosaicos
         if len(mosaicos)>1: mosaico = ', '.join(mosaicos.archivo.to_list())
         elif len(mosaicos)==1: mosaico = mosaicos.archivo.to_list()[0]
-        else: mosaico = ''
+        else: mosaico = pd.NA
 
         # listar dems/dtms ordenados por fecha (más reciente primero)
         modelos_de_elevacion = self.elementos.sort_values(by='datetime', ascending=False).loc[self.elementos.tipo_archivo == 'mosaico / dem']
         # dejar sólo los archivos que sean dsm o dtm
-        modelos_de_elevacion = mosaicos[(modelos_de_elevacion['archivo'].str.endswith('dsm.tif')) | (modelos_de_elevacion['archivo'].str.endswith('dtm.tif'))]
+        modelos_de_elevacion = modelos_de_elevacion.loc[(modelos_de_elevacion['archivo'].str.endswith('dsm.tif')) | (modelos_de_elevacion['archivo'].str.endswith('dtm.tif'))]
         # listar dems/dtms
         if len(modelos_de_elevacion)>1: modelo_de_elevacion = ', '.join(modelos_de_elevacion.archivo.to_list())
         elif len(modelos_de_elevacion)==1: modelo_de_elevacion = modelos_de_elevacion.archivo.to_list()[0]
-        else: modelo_de_elevacion = ''
+        else: modelo_de_elevacion = pd.NA
 
         # localidad
         coordenadas = (latitud, longitud)
@@ -510,6 +517,7 @@ class Vuelo:
 
         # guardar datos en la tabla self.info (dict)
         for dato, valor in zip(lista_variables, lista_valores):
+            if pd.isna(valor): valor=''
             self.info[dato] = valor
 
 
@@ -588,8 +596,7 @@ class Vuelo:
 
         # crear y luego borrar una imagen png temporal del mapa (evita algunos errores de origen desconocido)
         ruta_programa = inspect.getframeinfo(inspect.currentframe()).filename
-        carpeta_programa = os.path.dirname(os.path.abspath(ruta_programa))
-        ruta_archivo_temporal = os.path.join(carpeta_programa, '_temp.png')
+        ruta_archivo_temporal = os.path.join(os.environ['TEMP'], '_temp.png')
         fig.savefig(ruta_archivo_temporal)
         os.remove(ruta_archivo_temporal)
 
@@ -803,7 +810,7 @@ if __name__ == "__main__":
         #ventana_idioma.overrideredirect(True)
         ventana_idioma.config(bg='white')
         ventana_idioma.title('Bitácora')
-        ventana_idioma.iconphoto(False, tkinter.PhotoImage(file='./_iconos/icono.png'))
+        ventana_idioma.iconphoto(False, tkinter.PhotoImage(file=os.path.join(carpeta_iconos, 'icono.png')))
 
         # crear lista para seleccionar el idioma
         scrollbar = tkinter.Scrollbar(ventana_idioma, relief=tkinter.FLAT)
@@ -876,7 +883,7 @@ if __name__ == "__main__":
         ventana_espera.transient()
         ventana_espera.wm_geometry("200x75")
         ventana_espera.title('')
-        ventana_espera.iconphoto(False, tkinter.PhotoImage(file='./_iconos/icono.png'))
+        ventana_espera.iconphoto(False, tkinter.PhotoImage(file=os.path.join(carpeta_iconos, 'icono.png')))
         tkinter.Label(ventana_espera, text=texto).pack(expand=True)
         return ventana_espera
         
@@ -1019,13 +1026,26 @@ if __name__ == "__main__":
             abrir_vuelo(vuelo.info['carpeta'], actualizar=False)
 
 
-    def generar_descripcion(vuelo, formato='{fecha}, {hora}, {localidad}'):
-        nombre = formato.format(
-            localidad=vuelo.info['localidad'].split(',')[0],    # sólo el nombre de la ciudad
-            fecha=vuelo.info['fecha'],
-            hora=vuelo.info['hora'][0:5]    # solo la hora y los minutos
-        )
-        nombre = nombre.replace(', , ', ', ').strip(', ')
+    def generar_descripcion(vuelo):
+        nombre = ''
+        localidad=vuelo.info['localidad']
+        fecha=vuelo.info['fecha']
+        hora=vuelo.info['hora']
+        # agregar fecha
+        if fecha!='':
+            if nombre!='': nombre += ', '
+            nombre = nombre + fecha
+        print(nombre)
+        # agregar hora
+        if hora!='':
+            if nombre!='': nombre += ', '
+            nombre = nombre + hora[0:5]    # solo la hora y los minutos
+        print(nombre)
+        # agregar localidad
+        if localidad!='':
+            if nombre!='': nombre += ', '
+            nombre = nombre + localidad.split(',')[0]    # sólo el nombre de la ciudad
+        print(nombre)
         return nombre
 
 
@@ -1036,7 +1056,7 @@ if __name__ == "__main__":
         vuelo.guardar_kml()
         # actualizar lista de vuelos
         global lista_vuelos
-        fecha=vuelo.info['fecha'],
+        fecha=vuelo.info['fecha']
         hora=vuelo.info['hora'][0:5]    # solo la hora y los minutos
         nombre = vuelo.info['nombre']
         descripcion = vuelo.info['descripcion']
@@ -1071,6 +1091,8 @@ if __name__ == "__main__":
 
     def mostrar_vuelo(vuelo):
 
+        global carpeta_iconos
+
         ventana_vuelo = tkinter.Toplevel()
         tamanio_mapa = 400   # tamaño del mapa, que define el tamaño de la ventana
         margen_x  = 5
@@ -1081,7 +1103,7 @@ if __name__ == "__main__":
         ventana_vuelo.wm_geometry("%dx%d" % (tam_x_ventana_vuelo, tam_y_ventana_vuelo))
         ventana_vuelo.configure(background='white')
         ventana_vuelo.title(vuelo.info['nombre'])
-        ventana_vuelo.iconphoto(False, tkinter.PhotoImage(file='./_iconos/icono.png'))
+        ventana_vuelo.iconphoto(False, tkinter.PhotoImage(file=os.path.join(carpeta_iconos, 'icono.png')))
 
         ##########
         # BOTONES
@@ -1093,7 +1115,6 @@ if __name__ == "__main__":
         
         # BOTÓN GUARDAR
         # guarda los datos del vuelo
-        global carpeta_iconos
         icono_guardar = tkinter.PhotoImage(file = os.path.join(carpeta_iconos, 'guardar_vuelo.png'))
         boton_guardar = tkinter.Button(
             master=ventana_vuelo, 
@@ -1221,12 +1242,24 @@ if __name__ == "__main__":
     # localización del programa
     ruta_programa             = inspect.getframeinfo(inspect.currentframe()).filename
     carpeta_programa          = os.path.dirname(os.path.abspath(ruta_programa))
-    ruta_archivo_inicio       = os.path.join(carpeta_programa, '_configuracion', 'bitacora.ini')
-    ruta_archivo_vuelos       = os.path.join(carpeta_programa, '_vuelos', 'vuelos.csv')
-    ruta_archivo_traducciones = os.path.join(carpeta_programa, '_configuracion', 'textos_interfaz.xlsx')
+    carpeta_original_archivos_bitacora = os.path.join(carpeta_programa, 'bitacora_archivos')
+
+    # carpeta en "Documentos" con los archivos de bitacora (para que puedan ser modificados sin permisos de Administrador)
+    carpeta_documentos = shell.SHGetFolderPath(0, shellcon.CSIDL_PERSONAL, None, 0)
+    carpeta_archivos_bitacora = os.path.join(carpeta_documentos, 'bitacora_archivos')
+    # si no existe la carpeta, crearla y copiarle los archivos originales
+    if not os.path.exists(carpeta_archivos_bitacora):
+        os.makedirs(carpeta_archivos_bitacora)
+        archivos_a_copiar = ('bitacora.ini', 'vuelos.csv', 'textos_interfaz.xlsx')
+        for archivo in archivos_a_copiar:
+            shutil.copy2(os.path.join(carpeta_original_archivos_bitacora, archivo), carpeta_archivos_bitacora)
+
+    ruta_archivo_inicio       = os.path.join(carpeta_archivos_bitacora, 'bitacora.ini')
+    ruta_archivo_vuelos       = os.path.join(carpeta_archivos_bitacora, 'vuelos.csv')
+    ruta_archivo_traducciones = os.path.join(carpeta_archivos_bitacora, 'textos_interfaz.xlsx')
+    
     global carpeta_iconos
-    carpeta_iconos            = os.path.join(carpeta_programa, '_iconos')
-    carpeta_imagenes          = os.path.join(carpeta_programa, '_imagenes')
+    carpeta_iconos            = carpeta_original_archivos_bitacora
 
     # colores
     color_botones =                  '#d6e4ff'
@@ -1268,7 +1301,7 @@ if __name__ == "__main__":
     ventana.wm_geometry("%dx%d+%d+%d" % (tam_x_ventana, tam_y_ventana, pos_x_ventana, pos_y_ventana))
     ventana.configure(background='white')
     ventana.title('Bitácora')
-    ventana.iconphoto(False, tkinter.PhotoImage(file='./_iconos/icono.png'))
+    ventana.iconphoto(False, tkinter.PhotoImage(file=os.path.join(carpeta_iconos, 'icono.png')))
 
     # si aún no se ha elegido el idioma, se muestra la ventana de selección de idioma
     if idioma == '-': 
