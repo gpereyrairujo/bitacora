@@ -9,7 +9,7 @@ La aplicación de código abierto **Bitácora** ayuda a visualizar y organizar t
 &nbsp;
 ## Instalación
 
-1. Descargar el archivo zip desde <a href="https://github.com/gpereyrairujo/bitacora/releases/download/v0.6.0-alpha/bitacora.0.6.win.zip">https://github.com/gpereyrairujo/bitacora/releases/download/v0.6.0-alpha/bitacora.0.6.win.zip</a> (o la última versión publicada en <a href="https://github.com/gpereyrairujo/bitacora/releases">https://github.com/gpereyrairujo/bitacora/releases</a>)
+1. Descargar el archivo zip desde <a href="https://github.com/gpereyrairujo/bitacora/releases/download/v0.6.1-alpha/bitacora.0.6.1.win.zip">https://github.com/gpereyrairujo/bitacora/releases/download/v0.6.1-alpha/bitacora.0.6.1.win.zip</a> (o la última versión publicada en <a href="https://github.com/gpereyrairujo/bitacora/releases">https://github.com/gpereyrairujo/bitacora/releases</a>)
 
 2. Extraer los archivos del zip, y copiar la carpeta `bitacora` a la carpeta `C:/Archivos de programa` o a cualquier otra ubicación
 
